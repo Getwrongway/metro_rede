@@ -1,8 +1,0 @@
-oriente Q747
-moscavide N764
-encarnacao N523
-aeroporto Q607
-alvalade W668
-benfica S310
-rato Y544
-carnide W508
