@@ -99,7 +99,7 @@ stations **delete_station(stations **station, int *dim){
 		   printf("ID to delete: ");
 		   scanf("%s", id);
 		   printf/*GetWrongWay*/("Are you sure do you want to delete id: %s? [y/n]: ", id);
-		   scanf("%s", &conf);
+		   scanf(" %c", &conf);
 		   if (conf == 'y'){
 			   for(int i = 0; i < count; i++){
 				  if (strcmp(id, station[i]->id) == 0){
