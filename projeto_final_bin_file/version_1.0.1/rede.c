@@ -231,34 +231,45 @@ stations **load_stations_file(stations **input,char filename[], int *dim){
 		   return load;
 	   }
 	   else{
-		   long int/*GetWrongWay*/ count = 0;
-		   int version = 0;
-		   if (fread(&version, sizeof(int),1, fp) != 1){
-		      return NULL;
+		   char confirmation;
+		   printf("Are you sure that you want to reload information from the disk? [Y/N]: ");
+		   scanf(" %c", &confirmation);
+		   confirmation = toupper(confirmation);
+		   if (confirmation == 'Y'){
+			   long int/*GetWrongWay*/ count = 0;
+			   int version = 0;
+			   if (fread(&version, sizeof(int),1, fp) != 1){
+				  return NULL;
+			   }
+			   if (version != VERSION_SOFT){
+				   printf("File not supported on this version\n");
+				   sleep(2);
+				   return input;
+			   }
+				if (fread(&count, sizeof(int),1, fp) != 1){
+				  return NULL;
+			   }/*GetWrongWay*/
+				
+			   stations **load = (stations **)realloc(input, sizeof(stations*) * count);
+			   printf("-------------------Replace Station to the server-------------------\n");
+			   for(int i = 0; i < count;i++){
+				   fread(load[i]->station_name, sizeof(char), 100, fp);
+				   fread(load[i]->id, sizeof(char), 5, fp);/*GetWrongWay*/
+				   printf("Replacing station %d named %s, please wait!!!\n", i+1, load[i]->station_name);
+				   sleep(1); 
+			   } 
+			   printf("-------------------------------------------------------------------\n");
+			   sleep(2);/*GetWrongWay*/
+			   *dim = count;
+			   fclose(fp);
+			   return load;
 		   }
-		   if (version != VERSION_SOFT){
-			   printf("File not supported on this version\n");
+		   else{
+			   printf("Operation cancelled!!\n");
 			   sleep(2);
-			   return NULL;
-		   }
-		    if (fread(&count, sizeof(int),1, fp) != 1){
-		      return NULL;
-		   }/*GetWrongWay*/
-		    
-		   stations **load = (stations **)realloc(input, sizeof(stations*) * count);
-		   printf("-------------------Replace Station to the server-------------------\n");
-		   for(int i = 0; i < count;i++){
-			   fread(load[i]->station_name, sizeof(char), 100, fp);
-			   fread(load[i]->id, sizeof(char), 5, fp);/*GetWrongWay*/
-			   printf("Replacing station %d named %s, please wait!!!\n", i+1, load[i]->station_name);
-			   sleep(1); 
-		   } 
-           printf("-------------------------------------------------------------------\n");
-		   sleep(2);/*GetWrongWay*/
-		   *dim = count;
-		   fclose(fp);
-		   return load;
-	   }   
+			   return input;
+		   }   
+       }
    }
 }
 /*GetWrongWay*/
