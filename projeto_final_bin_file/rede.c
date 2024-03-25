@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>/*GetWrongWay*/
 #include <time.h>
+#include <ctype.h>
 #include "rede.h"
 #if defined(_WIN32)
 #include <windows.h>
@@ -34,6 +35,8 @@
 #include <unistd.h>
 #define CLS "clear"//cls windows, clear linux
 #endif
+
+#define VERSION "0.0.2\0"
 
 /*GetWrongWay*/
 
@@ -95,12 +98,17 @@ stations **delete_station(stations **station, int *dim){
 	   printf("---------------------------------------------\n");
 	   printf("Are you sure do want to delete a station? [y/n]: ");
 	   scanf(" %c", &out);
-	   if (out == 'y'){
+	   out = (char)toupper(out);
+	   if (out == 'Y'){
 		   printf("ID to delete: ");
 		   scanf("%s", id);
+		   for (int i = 0; i < 5; i++){
+		        id[i] = (char)toupper(id[i]);
+		   }
 		   printf/*GetWrongWay*/("Are you sure do you want to delete id: %s? [y/n]: ", id);
 		   scanf(" %c", &conf);
-		   if (conf == 'y'){
+		   conf = (char)toupper(conf);
+		   if (conf == 'Y'){
 			   for(int i = 0; i < count; i++){
 				  if (strcmp(id, station[i]->id) == 0){
 					 station[i] = NULL;
@@ -158,6 +166,10 @@ void save_stations_file(stations **station, char filename[], int dim){
    }
    else{
 	   if (station != NULL){/*GetWrongWay*/
+		   char *version = "0.0.2";
+		   if(fwrite(version, sizeof(char), 6, fp) !=1){
+		   }
+		   
 		   if (fwrite(&dim, sizeof(int), 1, fp) != 1){
 		   }
 		   
@@ -189,47 +201,66 @@ stations **load_stations_file(stations **input,char filename[], int *dim){
    else{	      /*GetWrongWay*/
 	   if(input == NULL){
 		   long int count = 0;
-	       if (fread(&count, sizeof(int),1, fp) != 1){
-		      return NULL;
+		   char *version;
+		   if(fread(version, sizeof(char), 6, fp) !=1){
 		   }
-	       stations **load = (stations **)/*GetWrongWay*/malloc(sizeof(stations*) * count);
-	       for(int i = 0; i < count; i++){   
-			   stations *loady = (stations *)malloc(sizeof(stations));
-			   load[i] = loady;
+		   if (strcmp(version, VERSION) != 0){
+				printf("Wrong file, please insert the correct file\n");
+				sleep(2);
+				return NULL;
 		   }
-		   printf("---------------------Add Station to the server---------------------\n");
-	 	   for(int i = 0; i < count;i++){
-			   fread(load[i]->station_name, sizeof(char), 100, fp);
-			   fread(load[i]->id, sizeof(char), 5, fp);/*GetWrongWay*/
-			   printf("Adding station %d named %s to the server, please wait!!!\n", i+1, load[i]->station_name);
-			   sleep(1);
-		   }
-           printf("-------------------------------------------------------------------\n");
-           sleep(2);
-		   *dim = count;
-		   fclose(fp);/*GetWrongWay*/
-		   return load;
+		   else{   
+			   if (fread(&count, sizeof(int),1, fp) != 1){
+				  return NULL;
+			   }
+			   stations **load = (stations **)/*GetWrongWay*/malloc(sizeof(stations*) * count);
+			   for(int i = 0; i < count; i++){   
+				   stations *loady = (stations *)malloc(sizeof(stations));
+				   load[i] = loady;
+			   }
+			   printf("---------------------Add Station to the server---------------------\n");
+			   for(int i = 0; i < count;i++){
+				   fread(load[i]->station_name, sizeof(char), 100, fp);
+				   fread(load[i]->id, sizeof(char), 5, fp);/*GetWrongWay*/
+				   printf("Adding station %d named %s to the server, please wait!!!\n", i+1, load[i]->station_name);
+				   sleep(1);
+			   }
+			   printf("-------------------------------------------------------------------\n");
+			   sleep(2);
+			   *dim = count;
+			   fclose(fp);/*GetWrongWay*/
+			   return load;
+		  }
 	   }
 	   else{
 		   long int/*GetWrongWay*/ count = 0;
-		   
-		    if (fread(&count, sizeof(int),1, fp) != 1){
-		      return NULL;
-		   }/*GetWrongWay*/
-		    
-		   stations **load = (stations **)realloc(input, sizeof(stations*) * count);
-		   printf("-------------------Replace Station to the server-------------------\n");
-		   for(int i = 0; i < count;i++){
-			   fread(load[i]->station_name, sizeof(char), 100, fp);
-			   fread(load[i]->id, sizeof(char), 5, fp);/*GetWrongWay*/
-			   printf("Replacing station %d named %s, please wait!!!\n", i+1, load[i]->station_name);
-			   sleep(1); 
-		   } 
-           printf("-------------------------------------------------------------------\n");
-		   sleep(2);/*GetWrongWay*/
-		   *dim = count;
-		   fclose(fp);
-		   return load;
+		   char *version;
+		    if(fread(version, sizeof(char), 6, fp) !=1){
+		   }
+		    if (strcmp(version, VERSION) != 0){
+				printf("Wrong file, please insert the correct file\n");
+				sleep(1);
+				return NULL;
+		   }
+		   else{
+				if (fread(&count, sizeof(int),1, fp) != 1){
+				  return NULL;
+			   }/*GetWrongWay*/
+				
+			   stations **load = (stations **)realloc(input, sizeof(stations*) * count);
+			   printf("-------------------Replace Station to the server-------------------\n");
+			   for(int i = 0; i < count;i++){
+				   fread(load[i]->station_name, sizeof(char), 100, fp);
+				   fread(load[i]->id, sizeof(char), 5, fp);/*GetWrongWay*/
+				   printf("Replacing station %d named %s, please wait!!!\n", i+1, load[i]->station_name);
+				   sleep(1); 
+			   } 
+			   printf("-------------------------------------------------------------------\n");
+			   sleep(2);/*GetWrongWay*/
+			   *dim = count;
+			   fclose(fp);
+			   return load;
+	      }
 	   }   
    }
 }
