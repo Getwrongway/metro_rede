@@ -183,6 +183,14 @@ int main(void){/*GetWrongWay*/
   save_stations_file(saved_stations, filename, dimensition);
   printf("--------------------------------------------------\n");
   sleep(1);
+  for(int i = 0; i < dimensition;i++){
+	if(saved_stations == NULL){
+		break;
+	}
+	else{
+      free(saved_stations[i]);
+    }
+  }
   free(saved_stations);
   system(CLS);
   printf("Hope to see you soon\nBYE!\n");
