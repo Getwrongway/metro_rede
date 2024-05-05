@@ -288,35 +288,46 @@ lines *create_line(){/*GetWrongWay*/
 	return line;
 }
 
-int size(lines *line){/*GetWrongWay*/
-   return line->size;
-}
-
-int is_empty(lines *line){
-	return (line->size == 0);
-}
-
-lines_info peek(lines *line, int *status){/*GetWrongWay*/
-  if (is_empty(line))
-  {
-    *status = 0;
-    return;
-  }
-  *status = 1;
-  return line->head->linha;
-}
-
-void seek(lines *line){/*GetWrongWay*/
-    Node *aux = line->head;
-    int count = 0;
-    printf("Estacoes disponiveis na: %s\n", line->line);
-	while (aux != NULL){
-		printf("Estacao %d: %s %s\n", ++count, aux->linha.station_line.station_name, aux->linha.station_line.id);
-		aux = aux->next;
+lines **crt_line(lines **line, char *name_line, int *dimensition){
+	int dim = *dimensition;
+	if(line == NULL){
+		lines **lin = (lines**)malloc(sizeof(lines*) * dim);
+		lin[0] = create_line();
+		strcpy(lin[0]->line, name_line);
+		*dimensition = dim;
+		return lin;
+	}
+	else{
+		dim++;
+		lines **lin = (lines**)realloc(line, sizeof(lines*) * dim);
+		lin[dim-1] = create_line();
+		strcpy(lin[dim-1]->line, name_line);
+	    *dimensition = dim;
+	    return lin;
 	}
 }
 
-void add_line(lines *line, char *line_name, char *n_station, char *id_station){/*GetWrongWay*/
+lines **delete_lines(lines **line, int num_line, int *dimensition){
+	int count = *dimensition;
+	char filename[100];
+	sprintf(filename, "%s.txt", line[num_line]->line);
+	remove(filename);
+	destroy_line(line[num_line]);
+	line[num_line] = NULL;
+	for(int i = 0; i < count; i++){
+		if(line[i] == NULL){
+			for(int j = i; j < count; j++){
+				line[j] = line[j+1];
+			}
+		}
+	}
+	count--;
+	lines **del = (lines**)realloc(line, sizeof(lines*) * count);
+	*dimensition = count;
+	return del;
+}
+
+void add_line(lines *line, char *n_station, char *id_station){/*GetWrongWay*/
   Node *newNode = malloc(sizeof(Node));
   
   strcpy(newNode->linha.station_line.station_name, n_station);
@@ -336,7 +347,7 @@ void add_line(lines *line, char *line_name, char *n_station, char *id_station){/
   line->size++;
 }
 
-lines rm_line(lines *line, int *status, char *id_station){/*GetWrongWay*/
+void rm_line(lines *line, int *status, char *id_station){/*GetWrongWay*/
 	Node *aux, *aux1;
 	if (line->head == NULL){
 		*status = 0;
@@ -387,18 +398,6 @@ lines rm_line(lines *line, int *status, char *id_station){/*GetWrongWay*/
 	}
 }
 
-void destroy_line(lines *line){/*GetWrongWay*/
-	Node *aux;
-    aux = line->head;
-    while(aux != NULL)
-    {
-        line->head = line->head->next;
-        free(aux);
-        aux = line->head;
-    }
-    free(line);
-}
-
 int check_stations_line(lines *line, stations *station, int count){
    Node *aux = line->head;
    while (aux != NULL){
@@ -412,39 +411,255 @@ int check_stations_line(lines *line, stations *station, int count){
    return 0;
 }
 
-lines **crt_line(lines **line, char *name_line, int *dimensition){
-	int dim = *dimensition;
-	if(line == NULL){
-		lines **lin = (lines**)malloc(sizeof(lines*) * dim);
-		lin[0] = create_line();
-		strcpy(lin[0]->line, name_line);
-		*dimensition = dim;
-		return lin;
-	}
-	else{
-		dim++;
-		lines **lin = (lines**)realloc(line, sizeof(lines*) * dim);
-		lin[dim-1] = create_line();
-		strcpy(lin[dim-1]->line, name_line);
-	    *dimensition = dim;
-	    return lin;
+void destroy_line(lines *line){/*GetWrongWay*/
+	Node *aux;
+    aux = line->head;
+    while(aux != NULL)
+    {
+        line->head = line->head->next;
+        free(aux);
+        aux = line->head;
+    }
+    free(line);
+}
+
+int size(lines *line){/*GetWrongWay*/
+   return line->size;
+}
+
+int is_empty(lines *line){
+	return (line->size == 0);
+}
+
+lines_info peek(lines *line, int *status){/*GetWrongWay*/
+  if (is_empty(line))
+  {
+    *status = 0;
+    return;
+  }
+  *status = 1;
+  return line->head->linha;
+}
+
+void seek(lines *line){/*GetWrongWay*/
+    Node *aux = line->head;
+    int count = 0;
+    printf("Estacoes disponiveis na: %s\n", line->line);
+	while (aux != NULL){
+		printf("Estacao %d: %s %s\n", ++count, aux->linha.station_line.station_name, aux->linha.station_line.id);
+		aux = aux->next;
 	}
 }
 
-lines **delete_lines(lines **line, int num_line, int *dimensition){
-	int count = *dimensition;
-	destroy_line(line[num_line]);
-	line[num_line] = NULL;
-	for(int i = 0; i < count; i++){
-		if(line[i] == NULL){
-			for(int j = i; j < count; j++){
-				line[j] = line[j+1];
+int save_lines_file(lines **line, char *filename, int dimensition){
+	FILE *fp;
+	fp = fopen(filename,"w");
+	
+	if (fp == NULL){
+		return 0;
+	}
+	else{
+		if (!fprintf(fp, "%d\n", dimensition))
+			return 0;
+		fclose(fp);
+
+		if(line == NULL){
+			return 0;
+		}
+		else{
+			for(int i = 0; i < dimensition; i++){
+				char file_line[100];
+				sprintf(file_line, "%s.txt", line[i]->line);
+				printf("Saving line to file: %s\n", file_line);
+				fp = fopen(file_line, "w");
+				if(fp == NULL){
+					return 0;
+				}
+				else{
+					/*int version = VERSION_SOFT;
+					if (!fprintf(fp, "%d\n", version))
+						return 0;
+						
+					if (!fprintf(fp, "%d\n", line[i]->size))
+						return 0;*/
+						
+					if (!fprintf(fp, "%s\n", line[i]->line))
+						return 0;
+					Node *aux = line[i]->head;
+					while(aux != NULL){
+						if (!fprintf(fp, "%s#%s\n", aux->linha.station_line.station_name, aux->linha.station_line.id))
+							return 0;
+						aux = aux->next;
+					}
+					printf("Line %s saved successfully\n", line[i]->line);
+					fclose(fp);
+					
+					fp = fopen(filename, "a");
+					
+					fprintf(fp, "%s\n", file_line);
+					
+					fclose(fp);
+				}
+			}
+			return 1;	
+		}
+	}
+}
+
+lines **load_lines_file(lines **line, char *filename, int *dimensition){
+	FILE *fp;
+	fp = fopen(filename, "r");
+	
+	if (fp == NULL){
+		return NULL;
+	}
+	else{
+		int size = 0, count = 0;
+		fscanf(fp, "%d", &size);
+		char temp[size][100];
+		while(fscanf(fp, "%s", temp[count])!=EOF)
+			count++;
+		/*printf("%d\n", size);
+		for(int i = 0; i < size; i++){
+			printf("%s\n", temp[i]);
+		}*/
+		fclose(fp);
+		if (line == NULL){
+			lines **out = (lines**)malloc(sizeof(lines*) * size);
+			for(int i = 0; i < size; i++){
+				fp = fopen(temp[i], "r");
+				if (fp == NULL){
+					return NULL;
+				}
+				else{
+					int inc = 0;
+					count = 0;
+					char ch;
+					while(1){
+						if (feof(fp)){
+							break;
+						}
+						ch = fgetc(fp);
+						if(ch == '\n'){
+							count++;
+						}
+					}
+					rewind(fp);
+					
+					char line_name[100];
+					char temp_t[count][100];
+					char stat[count][100];
+					char statid[count][10];
+					
+					while (fgets(temp_t[inc], 100, fp) != NULL){
+						if (inc == 0){
+							sep_string(temp_t[inc], stat[inc], line_name);
+							printf("%s\n", line_name);
+							out[i] = create_line();
+							strcpy(out[i]->line, line_name);
+						}
+						else{
+							sep_string(temp_t[inc], stat[inc], statid[inc]);
+							printf("%s %s\n", stat[inc], statid[inc]);
+							add_line(out[i], stat[inc], statid[inc]);
+						}
+						inc++;
+					}
+				}
+				printf("\n");
+				fclose(fp);
+			}
+			*dimensition = size;
+			return out;
+		}
+		else{
+			lines **out = (lines**)realloc(line, sizeof(lines*) * size);
+			for(int i = 0; i < size; i++){
+				fp = fopen(temp[i], "r");
+				if (fp == NULL){
+					return NULL;
+				}
+				else{
+					int inc = 0;
+					count = 0;
+					char ch;
+					while(1){
+						if (feof(fp)){
+							break;
+						}
+						ch = fgetc(fp);
+						if(ch == '\n'){
+							count++;
+						}
+					}
+					rewind(fp);
+					
+					char line_name[100];
+					char temp_t[count][100];
+					char stat[count][100];
+					char statid[count][10];
+					
+					while (fgets(temp_t[inc], 100, fp) != NULL){
+						if (inc == 0){
+							sep_string(temp_t[inc], stat[inc], line_name);
+							printf("%s\n", line_name);
+							out[i] = create_line();
+							strcpy(out[i]->line, line_name);
+						}
+						else{
+							sep_string(temp_t[inc], stat[inc], statid[inc]);
+							printf("%s %s\n", stat[inc], statid[inc]);
+							add_line(out[i], stat[inc], statid[inc]);
+						}
+						inc++;
+					}
+				}
+				printf("\n");
+				fclose(fp);
+			}
+			*dimensition = size;
+			return out;
+		}
+	}	
+}
+
+void sep_string(char *input, char *output, char *output1){
+	//printf("%s", input);
+	int size = strlen(input), temp = 0;
+	for (int i = 0; i < size; i++){
+		if (input[i] == '#'){
+			temp = i+1;
+			for(int j = 0; j <= i; j++){
+				if (j == i){
+					output[j] = '\0';
+				}
+				else{
+					output[j] = input[j];
+				}
+			}
+		}
+		else if(input[i] == '\n'){
+			if(temp > 0){
+				//printf("%d, %d\n", i, temp);
+				for(int j = temp; j <= i; j++){
+					if(j == i){
+						output1[j-temp] = '\0';
+					}
+					else{
+						output1[j-temp] = input[j];
+					}
+				}
+			}
+			else{
+				for(int j = 0; j <= i; j++){
+					if(j == i){
+						output1[j] = '\0';
+					}
+					else{
+						output1[j] = input[j];
+					}
+				}
 			}
 		}
 	}
-	count--;
-	lines **del = (lines**)realloc(line, sizeof(lines*) * count);
-	*dimensition = count;
-	return del;
 }
-

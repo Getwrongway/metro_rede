@@ -60,16 +60,19 @@ stations **load_stations_file(stations **input, char filename[], int *dim);
 //prototipos linhas
 
 lines *create_line();
+lines **crt_line(lines **line, char *name_line,int *dimensition);
+lines **delete_lines(lines **line, int num_line, int *dimensition);
+void add_line(lines *line, char *n_station, char *id_station);
+void rm_line(lines *line, int *status, char *id_station);
+int check_stations_line(lines *line, stations *station, int count);
+void destroy_line(lines *line);
 int size(lines *line);
 int is_empty(lines *line);
 lines_info peek(lines *line, int *status);
 void seek(lines *line);
-void add_line(lines *line, char *line_name, char *n_station, char *id_station);
-lines rm_line(lines *line, int *status, char *id_station);
-void destroy_line(lines *line);
-int check_stations_line(lines *line, stations *station, int count);
-lines **crt_line(lines **line, char *name_line,int *dimensition);
-lines **delete_lines(lines **line, int num_line, int *dimensition);
 
+int save_lines_file(lines **line, char *filename, int dimensition);
+lines **load_lines_file(lines **line, char *filename, int *dimensition);
 
+void sep_string(char *input, char *output, char *output1);
 #endif

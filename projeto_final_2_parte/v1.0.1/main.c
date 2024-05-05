@@ -54,6 +54,10 @@ int main(void){/*GetWrongWay*/
   sleep(2);
   system(CLS); 
   saved_stations = load_stations_file(saved_stations, filename, &dimensition);
+  system(CLS);
+  line = load_lines_file(line, filename_line, &dim_line);
+  sleep(2);
+  //add read lines from file on this line 
   while(1){
              if (menu_0 == '1'){
 				   if(menu_1 == '1'){
@@ -232,7 +236,7 @@ int main(void){/*GetWrongWay*/
 					scanf(" %[^\n]s", id_estacao);
 					for (int i = 0; i < dimensition; i++){
 						if(strcmp(saved_stations[i]->id, id_estacao) == 0){
-							add_line(line[choose], nome_linha, saved_stations[i]->station_name, saved_stations[i]->id);
+							add_line(line[choose], saved_stations[i]->station_name, saved_stations[i]->id);
 							printf("Saved with success!!\n");
 							break;
 						}
@@ -288,12 +292,33 @@ int main(void){/*GetWrongWay*/
 			   }
 			   else if (menu_2 == '6'){
 			 //back to main menu
+				 int status = save_lines_file(line, filename_line, dim_line);
+				 if (status == 1){
+					printf("Lines Saved successfully!!\n");
+					sleep(5);
+				 }
+				 else{
+					printf("Error saving to file!!\n");
+					sleep(2);
+				 }
+				 menu_0 = '2';
+				 menu_2 = '0';
+			   }
+			   else if (menu_2 == '7'){
+			 //back to main menu
+				 line = load_lines_file(line, filename_line, &dim_line);
+				 sleep(5);
+				 menu_0 = '2';
+				 menu_2 = '0';
+			   }
+			   else if (menu_2 == '8'){
+			 //back to main menu
 				 menu_0 = '0';
 				 menu_2 = '0';
 			   }
 			   else{
 				   printf("-----------------MENU-------------------\n");
-				   printf("1-New line\n2-Delete line\n3-Print line\n4-Add Stations to Line\n5-Delete Stations from Line\n6-Back Main Menu\n");
+				   printf("1-New line\n2-Delete line\n3-Print line\n4-Add Stations to Line\n5-Delete Stations from Line\n6-Save Lines\n7-Load Lines\n8-Back Main Menu\n");
 				   printf("----------------------------------------\n");
 				   printf("Option: ");
 				   scanf(" %c", &menu_2);
@@ -326,6 +351,12 @@ int main(void){/*GetWrongWay*/
   save_stations_file(saved_stations, filename, dimensition);
   printf("--------------------------------------------------\n");
   sleep(1);
+  system(CLS);
+  printf("-----Saving lines before closing the program-----\n");
+  save_lines_file(line, filename_line, dim_line);
+  printf("-------------------------------------------------\n");
+  sleep(2);
+  
   for(int i = 0; i < dimensition;i++){
 	if(saved_stations == NULL){
 		break;
@@ -334,7 +365,16 @@ int main(void){/*GetWrongWay*/
       free(saved_stations[i]);
     }
   }
+  for(int i = 0; i < dim_line;i++){
+	if(line == NULL){
+		break;
+	}
+	else{
+      free(line[i]);
+    }
+  }
   free(saved_stations);
+  free(line);
   system(CLS);
   printf("Hope to see you soon\nBYE!\n");
   return 0;
