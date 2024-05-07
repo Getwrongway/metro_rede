@@ -729,7 +729,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	Node *aux3_r = reverse_2->head;
 	
 	while(aux2_r != NULL){
-		//printf("%s\n", aux2_r->linha.station_line.station_name);
+		printf("%s\n", aux2_r->linha.station_line.station_name);
 		if (strcmp(aux2_r->linha.station_line.station_name, station_in) == 0){
 			break;
 		}
@@ -738,7 +738,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	}
 	
 	while(aux3_r != NULL){
-		//printf("%s\n", aux3_r->linha.station_line.station_name);
+		printf("%s\n", aux3_r->linha.station_line.station_name);
 		if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
 			break;
 		}
@@ -752,7 +752,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	printf("IN: %d,OUT: %d,RIN %d,ROUT %d\n", in, out, rin, rout);
 
 	if (strcmp(line[n_linha_in]->line, line[n_linha_out]->line) == 0){
-		if(rin < in){
+		if(rin <= in){
 			aux2_r = reverse_1->head;
 			while (aux2_r != NULL){			
 				if (strcmp(aux2_r->linha.station_line.station_name,station_out) == 0){
@@ -782,7 +782,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 		}
 	}
 	else{
-		if(rin < in){
+		if(rin <= in){
 			//printf("Reverse path\n");
 			aux2_r = reverse_1->head;
 			block = 0;
@@ -844,7 +844,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 				if (block){
 					break;
 				}
-				if(rout < out){
+				if(rout <= out){
 					//printf("None Reverse path\n");
 					aux1 = line[n_linha_out]->head;
 					while(aux1 != NULL){

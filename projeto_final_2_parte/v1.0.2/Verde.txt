@@ -1,2 +1,14 @@
 Verde
+Telheiras#C388
+Campo Grande#O000
+Alvalade#P684
+Roma#V147
+Areeiro#E765
 Alameda#E445
+Arroios#N062
+Anjos#C031
+Intendente#Q571
+Martim Moniz#D175
+Rossio#X620
+Baixa-Chiado#G045
+Cais do Sodre#O838
