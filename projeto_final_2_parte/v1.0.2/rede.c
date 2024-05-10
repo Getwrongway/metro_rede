@@ -455,8 +455,8 @@ int size(lines *line){/*GetWrongWay*/
 int is_empty(lines *line){
 	return (line->size == 0);
 }
-
-lines_info peek(lines *line, int *status){/*GetWrongWay*/
+/*GetWrongWay*/
+/*lines_info peek(lines *line, int *status){
   if (is_empty(line))
   {
     *status = 0;
@@ -464,7 +464,7 @@ lines_info peek(lines *line, int *status){/*GetWrongWay*/
   }
   *status = 1;
   return line->head->linha;
-}
+}*/
 
 void seek(lines *line){/*GetWrongWay*/
     Node *aux = line->head;
@@ -684,13 +684,12 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	int block = 0;
 	int in = 0, out = 0;
 	int rin = 0, rout = 0;
-	int num_0 = 0, num_1 = 0;
-	
-	
+
 	for(int i = 0; i < dim; i++){
 		if (block)
 			break;
 		aux = line[i]->head;
+		in = 0;
 		while(aux != NULL){
 			if (strcmp(aux->linha.station_line.station_name, station_in) == 0){
 				n_linha_in = i;
@@ -701,11 +700,16 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 			aux = aux->next;
 		}
 	}
+	if (!block){
+		printf("Station name badly written!!!\n");
+		return;
+	}
 	block = 0;
 	for(int i = 0; i < dim; i++){
 		if (block)
 			break;
 		aux1 = line[i]->head;
+		out = 0;
 		while(aux1 != NULL){
 			if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
 				n_linha_out = i;
@@ -716,11 +720,12 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 			aux1 = aux1->next;
 		}/*GetWrongWay*/
 	}
+	if (!block){
+		printf("Station name badly written!!!\n");
+		return;
+	}
 	
 	printf("You are at %s in the %s and you want to go to %s in the %s\n", station_in, line[n_linha_in]->line, station_out, line[n_linha_out]->line);
-	
-	aux = line[n_linha_in]->head;
-	aux1 = line[n_linha_out]->head;
 	
 	lines *reverse_1 = reverse(line[n_linha_in]);
 	lines *reverse_2 = reverse(line[n_linha_out]);
@@ -729,7 +734,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	Node *aux3_r = reverse_2->head;
 	
 	while(aux2_r != NULL){
-		printf("%s\n", aux2_r->linha.station_line.station_name);
+		//printf("%s\n", aux2_r->linha.station_line.station_name);
 		if (strcmp(aux2_r->linha.station_line.station_name, station_in) == 0){
 			break;
 		}
@@ -738,7 +743,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	}
 	
 	while(aux3_r != NULL){
-		printf("%s\n", aux3_r->linha.station_line.station_name);
+		//printf("%s\n", aux3_r->linha.station_line.station_name);
 		if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
 			break;
 		}
@@ -746,21 +751,24 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 		aux3_r = aux3_r->next;
 	}
 
-	
 	int temp = 0;
 	
-	printf("IN: %d,OUT: %d,RIN %d,ROUT %d\n", in, out, rin, rout);
-
+	
+	printf("IN: %d,OUT: %d,RIN %d,ROUT %d, Size1: %d, Size2: %d\n", in, out, rin, rout, line[n_linha_in]->size, line[n_linha_out]->size);
+	block = 0;
+	sleep(1);
 	if (strcmp(line[n_linha_in]->line, line[n_linha_out]->line) == 0){
-		if(rin <= in){
+		if((in > rin) || (out == 0)){
 			aux2_r = reverse_1->head;
 			while (aux2_r != NULL){			
 				if (strcmp(aux2_r->linha.station_line.station_name,station_out) == 0){
 					printf("%s\n", aux2_r->linha.station_line.station_name);
+					block = 1;
 					break;
 				}
-				if (temp >= rin){
-					printf("%s->", aux2_r->linha.station_line.station_name);
+				if (!block){
+					if(temp >= rin)
+						printf("%s->", aux2_r->linha.station_line.station_name);
 				}
 				temp++;
 				aux2_r = aux2_r->next;
@@ -771,10 +779,12 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 			while (aux != NULL){			
 				if (strcmp(aux->linha.station_line.station_name,station_out) == 0){
 					printf("%s\n", aux->linha.station_line.station_name);
+					block = 1;
 					break;
 				}
-				if (temp >= in){
-					printf("%s->", aux->linha.station_line.station_name);
+				if (!block){
+					if(temp >= in)
+						printf("%s->", aux->linha.station_line.station_name);
 				}
 				temp++;
 				aux = aux->next;
@@ -782,17 +792,323 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 		}
 	}
 	else{
-		if(rin <= in){
-			//printf("Reverse path\n");
-			aux2_r = reverse_1->head;
+		if(in > rin){
+			//Reverse path
 			block = 0;
+			aux2_r = reverse_1->head;
 			while (aux2_r != NULL){
 				if (block){
 					break;
 				}
-				if(rout >= out){
-					//printf("Reverse path\n");
+				if (rout == 0){
+					aux1 = line[n_linha_out]->head;
+					while (aux1 != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
+							while (aux1 != NULL){
+								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux1->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux1->linha.station_line.station_name);
+								aux1 = aux1->next;
+							}
+							block = 1;
+							break;
+						}
+						aux1 = aux1->next;
+					}
+				}
+				else if (out == 0){
 					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux3_r->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout < (reverse_2->size/3) && out >= (line[n_linha_out]->size/2)){
+					aux1 = line[n_linha_out]->head;
+					while (aux1 != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
+							while (aux1 != NULL){
+								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux1->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux1->linha.station_line.station_name);
+								aux1 = aux1->next;
+							}
+							block = 1;
+							break;
+						}
+						aux1 = aux1->next;
+					}
+				}
+				else if (rout >= (reverse_2->size/3) && out >= (line[n_linha_out]->size/2)){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux3_r->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout >= (reverse_2->size/3) && out <= (line[n_linha_out]->size/2)){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux3_r->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout >= (reverse_2->size/3)){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux3_r->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout <= (reverse_2->size/3)){
+					aux1 = line[n_linha_out]->head;
+					while (aux1 != NULL){
+						if (strcmp(aux2_r->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
+							while (aux1 != NULL){
+								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
+										printf("%s\n", aux1->linha.station_line.station_name);
+										block = 1;
+										break;
+									}
+								printf("%s->", aux1->linha.station_line.station_name);
+								aux1 = aux1->next;
+							}
+							block = 1;
+							break;
+						}
+						aux1 = aux1->next;
+					}
+				}
+				
+				if (!block){
+					if (temp >= rin)
+						printf("%s->", aux2_r->linha.station_line.station_name);
+				}
+				temp++;
+				aux2_r = aux2_r->next;
+			}
+		}
+		else{
+		//None Reverse path
+			block = 0;
+			aux = line[n_linha_in]->head;
+			while (aux != NULL){
+				if (rout == 0){
+					aux1 = line[n_linha_out]->head;
+					while (aux1 != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
+							while (aux1 != NULL){
+								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux1->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux1->linha.station_line.station_name);
+								aux1 = aux1->next;
+							}
+							block = 1;
+							break;
+						}
+						aux1 = aux1->next;
+					}
+				}
+				else if (out == 0){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux3_r->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout < (reverse_2->size/3) && out >= (line[n_linha_out]->size/2)){
+					aux1 = line[n_linha_out]->head;
+					while (aux1 != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
+							while (aux1 != NULL){
+								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux1->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux1->linha.station_line.station_name);
+								aux1 = aux1->next;
+							}
+							block = 1;
+							break;
+						}
+						aux1 = aux1->next;
+					}
+				}
+				
+				else if (rout >= (reverse_2->size/3) && out >= (line[n_linha_out]->size/2)){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux3_r->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				
+				else if (rout >= (reverse_2->size/3) && out <= (line[n_linha_out]->size/2)){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux3_r->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout >= (reverse_2->size/3)){
+					aux3_r = reverse_2->head;
+					while (aux3_r != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
+							while (aux3_r != NULL){
+								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux3_r->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux3_r->linha.station_line.station_name);
+								aux3_r = aux3_r->next;
+							}
+							block = 1;
+							break;
+						}
+						aux3_r = aux3_r->next;
+					}
+				}
+				else if (rout <= (reverse_2->size/3)){
+					aux1 = line[n_linha_out]->head;
+					while (aux1 != NULL){
+						if (strcmp(aux->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
+							while (aux1 != NULL){
+								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
+									printf("%s\n", aux1->linha.station_line.station_name);
+									block = 1;
+									break;
+								}
+								printf("%s->", aux1->linha.station_line.station_name);
+								aux1 = aux1->next;
+							}
+							block = 1;
+							break;
+						}
+						aux1 = aux1->next;
+					}
+				}
+				
+				if (!block){
+					if (temp >= in)
+						printf("%s->", aux->linha.station_line.station_name);
+				}
+				temp++;
+				aux = aux->next;
+			}
+		}
+	}	
+	destroy_line(reverse_1);
+	destroy_line(reverse_2);
+}
+
+lines *reverse(lines *line){
+	Node *aux = line->head;
+	lines *lin = (lines*)malloc(sizeof(lines));	
+	while (aux != NULL){
+		add_line(lin, aux->linha.station_line.station_name, aux->linha.station_line.id, 1);
+		aux = aux->next;
+	}
+	return lin;
+}
+
+/*
+ * 
+ * aux3_r = reverse_2->head;
 					while(aux3_r != NULL){
 						if (strcmp(aux2_r->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
 							while(aux3_r != NULL){
@@ -809,44 +1125,7 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 						}
 						aux3_r = aux3_r->next;
 					}
-				}
-				else{
-				//printf("None Reverse path\n");
-					aux1 = line[n_linha_out]->head;
-					while(aux1 != NULL){
-						if (strcmp(aux2_r->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
-							while(aux1 != NULL){
-								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
-									printf("%s\n", aux1->linha.station_line.station_name);
-									block = 1;
-										break;
-								}
-								printf("%s->", aux1->linha.station_line.station_name);
-								aux1 = aux1->next;
-							}
-							block = 1;
-							break;
-						}
-						aux1 = aux1->next;
-					}	
-				}
-				if (!block){
-					printf("%s->", aux2_r->linha.station_line.station_name);
-				}
-				aux2_r = aux2_r->next;
-			}
-		}
-		else{
-			//printf("None Reverse path\n");
-			aux = line[n_linha_in]->head;
-			block = 0;
-			while (aux != NULL){
-				if (block){
-					break;
-				}
-				if(rout <= out){
-					//printf("None Reverse path\n");
-					aux1 = line[n_linha_out]->head;
+	aux1 = line[n_linha_out]->head;
 					while(aux1 != NULL){
 						if (strcmp(aux->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
 							while(aux1 != NULL){
@@ -862,43 +1141,11 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 							break;
 						}
 						aux1 = aux1->next;
-					}
-				}
-				else{
-					//printf("Reverse path\n");
-					aux3_r = reverse_2->head;
-					while(aux3_r != NULL){
-						if (strcmp(aux->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
-							while(aux3_r != NULL){
-								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
-									printf("%s\n", aux3_r->linha.station_line.station_name);
-									block = 1;
-									break;
-								}
-								printf("%s->", aux3_r->linha.station_line.station_name);
-								aux3_r = aux3_r->next;
-							}
-							block = 1;
-							break;
-						}
-						aux3_r = aux3_r->next;
-					}
-				}
-				if (!block){
-					printf("%s->", aux->linha.station_line.station_name);
-				}
-				aux = aux->next;
-			}
-		}	
-	}
-}
-
-lines *reverse(lines *line){
-	Node *aux = line->head;
-	lines *lin = (lines*)malloc(sizeof(lines));	
-	while (aux != NULL){
-		add_line(lin, aux->linha.station_line.station_name, aux->linha.station_line.id, 1);
-		aux = aux->next;
-	}
-	return lin;
-}
+					}				
+					
+					
+					
+					
+					
+					
+					*/

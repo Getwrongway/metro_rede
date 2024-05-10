@@ -334,23 +334,22 @@ int main(void){/*GetWrongWay*/
 			   }
 			   else if (menu_2 == '7'){
 			 //back to main menu
-				 line = load_lines_file(line, filename_line, &dim_line);
-				 sleep(5);
-				 menu_0 = '2';
-				 menu_2 = '0';
+					 line = load_lines_file(line, filename_line, &dim_line);
+					 sleep(5);
+					 menu_0 = '2';
+					 menu_2 = '0';
 			   }
 			   else if (menu_2 == '8'){
 			 //back to main menu
-				int coco;
-				char input[100], output[100];
-				printf("Insert the start station: ");
-				scanf(" %[^\n]s",  input);
-				printf("Insert the end station: ");
-				scanf(" %[^\n]s",  output);
-				route_calculation(line, dim_line, input, output);
-				scanf("%d", &coco);
-				 menu_0 = '2';
-				 menu_2 = '0';
+					char input[100], output[100];
+					printf("Insert the start station: ");
+					scanf(" %[^\n]s",  input);
+					printf("Insert the end station: ");
+					scanf(" %[^\n]s",  output);
+					route_calculation(line, dim_line, input, output);
+					sleep(5);
+					menu_0 = '2';
+					menu_2 = '0';
 			   }
 			   else if (menu_2 == '9'){
 			 //back to main menu
