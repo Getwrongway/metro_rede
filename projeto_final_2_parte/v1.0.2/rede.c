@@ -752,25 +752,12 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 	block = 0;
 	//sleep(1);
 	if (strcmp(line[n_linha_in]->line, line[n_linha_out]->line) == 0){
-		if(out == 0){
-			aux2_r = reverse_1->head;
-			while (aux2_r != NULL){			
-				if (strcmp(aux2_r->linha.station_line.station_name,station_out) == 0){
-					printf("%s\n", aux2_r->linha.station_line.station_name);
-					block = 1;
-					break;
-				}
-				if (!block){
-					if(temp >= rin)
-						printf("%s->", aux2_r->linha.station_line.station_name);
-				}
-				temp++;
-				aux2_r = aux2_r->next;
-			}
-		}
 		if(rout > rin){
 			aux2_r = reverse_1->head;
-			while (aux2_r != NULL){			
+			while (aux2_r != NULL){	
+				if (block){
+					break;
+				}		
 				if (strcmp(aux2_r->linha.station_line.station_name,station_out) == 0){
 					printf("%s\n", aux2_r->linha.station_line.station_name);
 					block = 1;
@@ -786,7 +773,10 @@ void route_calculation(lines **line, int dim, char *station_in, char *station_ou
 		}
 		else{
 			aux = line[n_linha_in]->head;
-			while (aux != NULL){			
+			while (aux != NULL){
+				if (block){
+					break;
+				}			
 				if (strcmp(aux->linha.station_line.station_name,station_out) == 0){
 					printf("%s\n", aux->linha.station_line.station_name);
 					block = 1;
