@@ -68,7 +68,6 @@ int check_stations_line(lines *line, stations *station, int count);
 void destroy_line(lines *line);
 int size(lines *line);
 int is_empty(lines *line);
-//lines_info peek(lines *line, int *status);
 void seek(lines *line);
 
 int save_lines_file(lines **line, char *filename, int dimensition);

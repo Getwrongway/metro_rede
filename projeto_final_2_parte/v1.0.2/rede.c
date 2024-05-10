@@ -456,15 +456,6 @@ int is_empty(lines *line){
 	return (line->size == 0);
 }
 /*GetWrongWay*/
-/*lines_info peek(lines *line, int *status){
-  if (is_empty(line))
-  {
-    *status = 0;
-    return;
-  }
-  *status = 1;
-  return line->head->linha;
-}*/
 
 void seek(lines *line){/*GetWrongWay*/
     Node *aux = line->head;
@@ -1106,47 +1097,3 @@ lines *reverse(lines *line){
 	}
 	return lin;
 }
-
-/*
- * 
- * aux3_r = reverse_2->head;
-					while(aux3_r != NULL){
-						if (strcmp(aux2_r->linha.station_line.station_name,aux3_r->linha.station_line.station_name) == 0){
-							while(aux3_r != NULL){
-								if (strcmp(aux3_r->linha.station_line.station_name, station_out) == 0){
-									printf("%s\n", aux3_r->linha.station_line.station_name);
-									block = 1;
-									break;
-								}
-								printf("%s->", aux3_r->linha.station_line.station_name);
-								aux3_r = aux3_r->next;
-							}
-							block = 1;
-							break;
-						}
-						aux3_r = aux3_r->next;
-					}
-	aux1 = line[n_linha_out]->head;
-					while(aux1 != NULL){
-						if (strcmp(aux->linha.station_line.station_name,aux1->linha.station_line.station_name) == 0){
-							while(aux1 != NULL){
-								if (strcmp(aux1->linha.station_line.station_name, station_out) == 0){
-									printf("%s\n", aux1->linha.station_line.station_name);
-									block = 1;
-									break;
-								}
-								printf("%s->", aux1->linha.station_line.station_name);
-								aux1 = aux1->next;
-							}
-							block = 1;
-							break;
-						}
-						aux1 = aux1->next;
-					}				
-					
-					
-					
-					
-					
-					
-					*/

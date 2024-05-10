@@ -341,24 +341,12 @@ int main(void){/*GetWrongWay*/
 			   }
 			   else if (menu_2 == '8'){
 			 //back to main menu
-					char input[100], output[100];
-					printf("Insert the start station: ");
-					scanf(" %[^\n]s",  input);
-					printf("Insert the end station: ");
-					scanf(" %[^\n]s",  output);
-					route_calculation(line, dim_line, input, output);
-					sleep(5);
-					menu_0 = '2';
-					menu_2 = '0';
-			   }
-			   else if (menu_2 == '9'){
-			 //back to main menu
 				 menu_0 = '0';
 				 menu_2 = '0';
 			   }
 			   else{
 				   printf("-----------------MENU-------------------\n");
-				   printf("1-New line\n2-Delete line\n3-Print line\n4-Add Stations to Line\n5-Delete Stations from Line\n6-Save Lines\n7-Load Lines\n8-Route Calculation\n9-Back Main Menu\n");
+				   printf("1-New line\n2-Delete line\n3-Print line\n4-Add Stations to Line\n5-Delete Stations from Line\n6-Save Lines\n7-Load Lines\n8-Back Main Menu\n");
 				   printf("----------------------------------------\n");
 				   printf("Option: ");
 				   scanf(" %c", &menu_2);
@@ -370,12 +358,23 @@ int main(void){/*GetWrongWay*/
 			    }       
 			}
 			else if (menu_0 == '3'){/*GetWrongWay*/
+				system(CLS);
+			   char input[100], output[100];
+					printf("Insert the start station: ");
+					scanf(" %[^\n]s",  input);
+					printf("Insert the end station: ");
+					scanf(" %[^\n]s",  output);
+					route_calculation(line, dim_line, input, output);
+					sleep(5);
+			   menu_0 = '0';
+			}
+			else if (menu_0 == '4'){/*GetWrongWay*/
 			   break;
 			}
 			else{
 				system(CLS);
 				printf("------------------MENU------------------\n");
-				printf("1-Manage stations\n2-Manage lines\n3-Exit\n");
+				printf("1-Manage stations\n2-Manage lines\n3-Route Calculation\n4-Exit\n");
 				printf("----------------------------------------\n");
 				printf("Option: ");
 				scanf(" %c", &menu_0);
