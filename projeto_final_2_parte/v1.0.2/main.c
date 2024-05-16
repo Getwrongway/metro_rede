@@ -409,7 +409,7 @@ int main(void){/*GetWrongWay*/
 		break;
 	}
 	else{
-      free(line[i]);
+      destroy_line(line[i]);
     }
   }
   free(saved_stations);
